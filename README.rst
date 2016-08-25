@@ -22,12 +22,13 @@ The vms will be connected to the same network, There will be also connectivity b
 Prerequisite
 ^^^^^^^^^^^^^
 
+- Make sure your machine has 3GB RAM
 - `Install Lago <http://lago.readthedocs.io/en/latest/README.html#installation>`_
 - Clone this repository to your machine.
 
 ::
 
-    git clone https://github.com/gbenhaim/Lago-Demo.git
+    git clone https://github.com/lago-project/Lago-Demo.git
 
 Let's start !
 ^^^^^^^^^^^^^^
