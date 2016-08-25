@@ -1,5 +1,6 @@
 #!/bin/bash -xe
 
+#Let's reviews the install script
 
 REPONAME="ovirt-system-tests"
 REPOURL="https://gerrit.ovirt.org"
