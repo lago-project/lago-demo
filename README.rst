@@ -4,15 +4,15 @@ Lago Demo
 About
 ^^^^^^
 
-In this demo we will learn how to set up a basic environment with Lago.
-The environment will consist of three virtual machines that will host Jenkins infrastructure.
+In this demo we will learn how to set up basic environments with Lago.
+The first environment will consist of two virtual machines with no customisation at all.
+The second environment will consist of three virtual machines that will host Jenkins infrastructure.
 
 The VMs
 ^^^^^^^
 
--  "vm0-server" - Jenkins server
--  "vm1-slave" - Jenkins slave
--  "vm2-slave" - Jenkins slave
+-  "vm1" - First machine
+-  "vm2" - Second machine
 
 The network
 ^^^^^^^^^^^^
@@ -27,14 +27,16 @@ Prerequisite
 
 ::
 
-    git clone https://github.com/gbenhaim/Lago-Demo.git
+    git clone https://github.com/lago-project/Lago-Demo.git
 
 Let's start !
 ^^^^^^^^^^^^^^
 
+To begin, we will deploy two simple vms
 From within the cloned repository, run the following commands:
 
 -  Create the environment.
+Note it used LagoInitFile within the current directory as default
 
 ::
 
@@ -55,15 +57,14 @@ From within the cloned repository, run the following commands:
     lago deploy
 
 The environment is ready!
-Now you can open your favorite browser, enter "vm0-server-ip-adress:8080" and the jenkins dashboard will be opened.
-How to figure out what is the ip of "vm0-server" ?
+Now you can ssh vm1-ip. How to figure out what is the ip of "vm1" ?
 Check out the following commands:
 
-- Open a shell to vm0-server (for any other vm, just replace 'vm0-server' with the name of the machine)
+- Open a shell to vm1 (for any other vm, just replace 'vm1' with the name of the machine)
 
 ::
 
-    lago shell vm0-server
+    lago shell vm1
 
 - Print some usefull information about the environment.
 
@@ -95,6 +96,28 @@ And if you will not have a need for the environment in the future:
 ::
 
     lago destroy
+
+Jenkins example
+^^^^^^^^^^^^^^^
+
+In this scenario, we will deploy 3 vms, one jenkins server with two slaves.
+
+The VMs
+^^^^^^^
+
+-  "vm0-server" - Jenkins server
+-  "vm1-slave" - Jenkins slave
+-  "vm2-slave" - Jenkins slave
+
+Lets init the environment with a specific configuration file.
+Note it also used the metadata key to pass a specific script for each machine
+
+::
+
+    lago init LagoInitFile.jenkins
+
+Once the environment is deployed, open your favorite browser, enter "vm0-server-ip-adress:8080" and the jenkins dashboard will be opened!
+
 
 Advanced stuff
 ^^^^^^^^^^^^^^^
