@@ -27,7 +27,7 @@ Prerequisite
 
 ::
 
-    git clone https://github.com/gbenhaim/Lago-Demo.git
+    git clone https://github.com/lago-project/lago-demo.git
 
 Let's start !
 ^^^^^^^^^^^^^^
