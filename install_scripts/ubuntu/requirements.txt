@@ -1,0 +1,11 @@
+libvirt-python
+lxml
+lockfile
+paramiko
+pbr
+xmltodict
+scp
+setuptools
+stevedore
+PyYAML
+enum

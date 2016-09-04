@@ -1,0 +1,36 @@
+README
+--------
+
+'install_deb_deps.sh' contains all the deps that aren't on PyPi
+
+'requirements.txt' contains all the deps that are on PyPi
+
+Useful information
+--------------------
+
+libvirt service name - libvirt-bin
+libvirt group - libvirtd
+qemu user - libvirt-qemu
+
+qemu-kvm installation guide - https://help.ubuntu.com/lts/serverguide/libvirt.html
+
+
+Changes to lago code:
+----------------------
+
+1. add 'qemu-system-x86_64' to lago/vm line 234
+
+Changes to rpm packaging
+--------------------------
+
+1. Find a solution for the creation of:
+    /var/lib/lago
+    /etc/lago.d
+
+
+Others
+--------
+
+1. Write an install script for ubuntu - There are too many changes that need to be made
+to the install script of el/fc (repos, install commands, names of groups and services).
+I think that it will be better to write a separate install script.
