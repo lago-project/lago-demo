@@ -1,12 +1,12 @@
 #!/bin/bash -xe
 
-#Let's reviews the install script
+#Let's review the install script
 
 REPONAME="ovirt-system-tests"
 REPOURL="https://gerrit.ovirt.org"
 
-function check_virtualization() {
-  if dmesg | grep 'kvm: disabled by BIOS'; then
+check_virtualization() {
+  if dmesg | grep -q 'kvm: disabled by BIOS'; then
       echo "Please enable virtualization in BIOS"
       exit 1
   else
@@ -14,11 +14,20 @@ function check_virtualization() {
   fi
 }
 
-function enable_nested() {
-  local is_enabled=$(cat /sys/module/kvm_intel/parameters/nested)
-  if [[ $is_enabled == 'N' ]]; then
+check_cpu_man() {
+  if lscpu | grep -q 'Model name:\s*Intel'; then
+    echo intel
+  else
+    echo amd
+  fi
+}
+
+enable_nested() {
+  local cpu_man=$(check_cpu_man)
+  local is_enabled=$(cat /sys/module/kvm_"$cpu_man"/parameters/nested)
+  if [[ "$is_enabled" == 'N' ]]; then
       echo "Enabling nested virtualization..."
-      echo "options kvm-intel nested=y" >> /etc/modprobe.d/kvm-intel.conf
+      echo "options kvm-$cpu_man nested=y" >> /etc/modprobe.d/kvm-"$cpu_man".conf
       echo "Please restart and rerun installation"
       exit 1
   else
@@ -26,12 +35,12 @@ function enable_nested() {
   fi
 }
 
-function install_lago() {
+install_lago() {
     echo "Installing lago"
     yum install -y python-lago python-lago-ovirt
 }
 
-function add_lago_repo() {
+add_lago_repo() {
     echo "Configuring repos"
     local DIST=$(uname -r | sed -r  's/^.*\.([^\.]+)\.[^\.]+$/\1/')
     cat > /etc/yum.repos.d/lago.repo <<EOF
@@ -48,7 +57,7 @@ enabled=1
 gpgcheck=0
 EOF
 
-    if ! grep "Fedora" /etc/redhat-release; then
+    if ! grep -q "Fedora" /etc/redhat-release; then
         cat > /etc/yum.repos.d/epel.repo <<EOF
 [epel]
 name=epel
@@ -58,49 +67,50 @@ EOF
     fi
 }
 
-function post_install_conf_for_lago() {
+post_install_conf_for_lago() {
     echo "Configuring permissions"
     # if not root
-    if [[ $user != "root" ]]; then
-        usermod -a -G lago $user
-        usermod -a -G qemu $user
+    if [[ "$user" != "root" ]]; then
+        usermod -a -G lago "$user"
+        usermod -a -G qemu "$user"
     fi
 
     usermod -a -G "$user" qemu
-    chmod g+x $HOME
+    chmod g+x "/home/$user"
 }
 
-function enable_libvirt() {
+enable_libvirt() {
     echo "Starting libvirt"
     systemctl restart libvirtd
     systemctl enable libvirtd
 }
 
-function run_system_tests() {
-    #if no suite supllied
-    if [[ ! "$suite" ]]; then
-        exit 0
-    fi
+run_suite() {
+    sudo -u "$user" bash <<EOF
+if [[ ! "$suite" ]]; then
+    exit 0
+fi
 
-    echo "Running "$REPONAME""
-    # clone or pull if already exist
-    if [[ -d "$REPONAME" ]]; then
-        cd "$REPONAME"
-        git pull "$REPOURL"/"$REPONAME"
-    else
-        git clone "$REPOURL"/"$REPONAME" &&
-        cd "$REPONAME"
-    fi
-    # check if the suite exists
-    if [[ "$?" == "0" ]] && [[ -d "$suite" ]]; then
-        ./run_suite.sh "$suite"
-    else
-        echo "Suite $suite wasn't found"
-        exit 1
-    fi
+echo "Running $REPONAME"
+# clone or pull if already exist
+if [[ -d "$REPONAME" ]]; then
+    cd "$REPONAME"
+    git pull "$REPOURL"/"$REPONAME"
+else
+    git clone "$REPOURL"/"$REPONAME" &&
+    cd "$REPONAME"
+fi
+# check if the suite exists
+if [[ "$?" == "0" ]] && [[ -d "$suite" ]]; then
+    ./run_suite.sh "$suite"
+else
+    echo "Suite $suite wasn't found"
+    exit 1
+fi
+EOF
 }
 
-function print_help() {
+print_help() {
   cat<<EOH
 Usage: $0 user_name [suite_to_run]
 
@@ -114,7 +124,7 @@ suite will be run.
 EOH
 }
 
-function check_input() {
+check_input() {
     id -u "$1" > /dev/null ||
     {
         echo "User $1 doesn't exist"
@@ -123,7 +133,7 @@ function check_input() {
     }
 }
 
-function main() {
+main() {
     check_input "$1"
     user="$1"
     suite="$2"
@@ -133,7 +143,7 @@ function main() {
     install_lago
     post_install_conf_for_lago
     enable_libvirt
-    run_system_tests
+    run_suite
 }
 
 main "$@"
