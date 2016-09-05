@@ -69,14 +69,15 @@ EOF
 
 post_install_conf_for_lago() {
     echo "Configuring permissions"
-    # if not root
     if [[ "$user" != "root" ]]; then
         usermod -a -G lago "$user"
         usermod -a -G qemu "$user"
+        chmod g+x "/home/$user"
+    else
+        chmod g+x "/root"
     fi
 
     usermod -a -G "$user" qemu
-    chmod g+x "/home/$user"
 }
 
 enable_libvirt() {
