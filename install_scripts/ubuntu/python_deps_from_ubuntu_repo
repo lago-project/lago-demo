@@ -1,0 +1,13 @@
+Python deps for lago - from ubuntu repos (xenial)
+--------------------------------------------
+
+python-lxml
+python-lockfile
+python-paramiko
+python-pbr
+python-scp
+python-xmltodict
+python-setuptools
+python-stevedore
+python-yaml
+python-enum
