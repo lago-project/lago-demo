@@ -56,12 +56,7 @@ gpgcheck=0
 EOF
 
     if ! grep -q "Fedora" /etc/redhat-release; then
-        cat > /etc/yum.repos.d/epel.repo <<EOF
-[epel]
-name=epel
-mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=epel-7&arch=x86_64
-gpgkey=https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7Server
-EOF
+        yum -y install epel-release
     fi
 }
 
