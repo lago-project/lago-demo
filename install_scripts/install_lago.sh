@@ -39,25 +39,26 @@ install_lago() {
 }
 
 add_lago_repo() {
+    if ! grep -q "Fedora" /etc/redhat-release; then
+        yum -y install epel-release
+        local DISTRO=el
+    else
+        local DISTRO=fc
+    fi
     echo "Configuring repos"
-    local DIST=$(uname -r | sed -r  's/^.*\.([^\.]+)\.[^\.]+$/\1/')
     cat > /etc/yum.repos.d/lago.repo <<EOF
 [lago]
-baseurl=http://resources.ovirt.org/repos/lago/stable/0.0/rpm/$DIST
+baseurl=http://resources.ovirt.org/repos/lago/stable/0.0/rpm/${DISTRO}\$releasever
 name=Lago
 enabled=1
 gpgcheck=0
 
 [ci-tools]
-baseurl=http://resources.ovirt.org/repos/ci-tools/$DIST
+baseurl=http://resources.ovirt.org/repos/ci-tools/${DISTRO}\$releasever
 name=ci-tools
 enabled=1
 gpgcheck=0
 EOF
-
-    if ! grep -q "Fedora" /etc/redhat-release; then
-        yum -y install epel-release
-    fi
 }
 
 post_install_conf_for_lago() {
