@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
 REPONAME="ovirt-system-tests"
 REPOURL="https://gerrit.ovirt.org"
