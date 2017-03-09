@@ -38,6 +38,11 @@ install_lago() {
     yum install -y python-lago python-lago-ovirt
 }
 
+install_dependencies() {
+    echo "Installing additional packages"
+    yum install -y virt-viewer
+}
+
 add_lago_repo() {
     if ! grep -q "Fedora" /etc/redhat-release; then
         yum -y install epel-release
@@ -136,6 +141,7 @@ main() {
     enable_nested
     add_lago_repo
     install_lago
+    install_dependencies
     post_install_conf_for_lago
     enable_libvirt
     run_suite
