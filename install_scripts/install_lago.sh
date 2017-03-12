@@ -1,7 +1,14 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
 REPONAME="ovirt-system-tests"
 REPOURL="https://gerrit.ovirt.org"
+
+
+exit_error() {
+    ! [[ -z "$1" ]] && echo "ERROR: $1"
+    ! [[ -z "$2" ]] && exit "$2"
+    exit 1
+}
 
 check_virtualization() {
   if dmesg | grep -q 'kvm: disabled by BIOS'; then
@@ -39,22 +46,55 @@ install_lago() {
 }
 
 add_lago_repo() {
-    if ! grep -q "Fedora" /etc/redhat-release; then
-        yum -y install epel-release
-        local DISTRO=el
+    local distro
+    local distro_str
+    distro_str=$(rpm -E "%{?dist}") || exit_error "rpm command not found, only \
+      RHEL/CentOS/Fedora are supported"
+
+    if [[ $distro_str == ".el7" ]]; then
+        distro="el"
+        if [[ $(rpm -E "%{?centos}") == "7" ]]; then
+            echo "Detected distro is CentOS 7"
+            echo "Adding EPEL repository"
+            yum -y install epel-release
+        else
+            echo "
+            Detected distro is RHEL 7, please ensure you have the following
+            repositories enabled:
+
+            rhel-7-server-rpms
+            rhel-7-server-optional-rpms
+            rhel-7-server-extras-rpms
+            rhel-7-server-rhv-4-mgmt-agent-rpms
+
+            And EPEL, which can be installed(after enabling the above
+            repositories), by running:
+
+              yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
+            Continuing installation, if it fails on missing packages,
+            try configuring the repositories and re-try.
+
+            If you need any help, feel free to email: infra@ovirt.org
+            "
+        fi
+    elif [[ $distro_str =~ ^.fc2[45]$ ]]; then
+        echo "Detected distro is Fedora"
+        distro="fc"
     else
-        local DISTRO=fc
+        exit_error "Unsupported distro: $distro_str, Supported distros: \
+            fc24, fc25, el7."
     fi
-    echo "Configuring repos"
+    echo "Adding Lago repositories.."
     cat > /etc/yum.repos.d/lago.repo <<EOF
 [lago]
-baseurl=http://resources.ovirt.org/repos/lago/stable/0.0/rpm/${DISTRO}\$releasever
+baseurl=http://resources.ovirt.org/repos/lago/stable/0.0/rpm/${distro}\$releasever
 name=Lago
 enabled=1
 gpgcheck=0
 
 [ci-tools]
-baseurl=http://resources.ovirt.org/repos/ci-tools/${DISTRO}\$releasever
+baseurl=http://resources.ovirt.org/repos/ci-tools/${distro}\$releasever
 name=ci-tools
 enabled=1
 gpgcheck=0
@@ -63,10 +103,12 @@ EOF
 
 post_install_conf_for_lago() {
     echo "Configuring permissions"
+    local user_home
     if [[ "$user" != "root" ]]; then
+        user_home=$(eval echo "~$user")
         usermod -a -G lago "$user"
         usermod -a -G qemu "$user"
-        chmod g+x "/home/$user"
+        chmod g+x "$user_home"
     else
         chmod g+x "/root"
     fi
