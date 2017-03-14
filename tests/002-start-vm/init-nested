@@ -1,0 +1,21 @@
+domains:
+  nested:
+    memory: 512
+    service_provider: systemd
+    nics:
+      - net: lago-nested
+    disks:
+      - template_name: el7.3-base
+        type: template
+        name: root
+        dev: vda
+        format: qcow2
+nets:
+  lago-nested:
+    gw: 192.168.22.1
+    type: nat
+    dhcp:
+      start: 100
+      end: 254
+    management: true
+    dns_domain_name: lago-nested.local
