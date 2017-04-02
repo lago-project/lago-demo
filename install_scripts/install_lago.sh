@@ -90,7 +90,7 @@ enable_nested() {
 
 install_lago() {
     echo "Installing lago"
-    yum install -y python-lago python-lago-ovirt
+    yum install -y lago lago-ovirt
 }
 
 add_lago_repo() {
