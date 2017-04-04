@@ -99,7 +99,7 @@ add_lago_repo() {
     distro_str=$(rpm -E "%{?dist}") || exit_error "rpm command not found, only \
       RHEL/CentOS/Fedora are supported"
     echo "Detected distro is $distro_str"
-    if [[ $distro_str == ".el7" ]]; then
+    if [[ $distro_str =~ ^.el7(_[1-4])?$ ]]; then
         print_rhel_notes
         distro="el"
     elif [[ $distro_str == ".el7.centos" ]]; then
