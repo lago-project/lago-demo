@@ -10,7 +10,7 @@ readonly RHEL_CHANNELS=(
 'rhel-7-server-rhv-4-mgmt-agent-rpms'
 )
 
-join_array() {
+function join_array() {
     local sep arr
     sep=','
     arr=("$@")
@@ -19,7 +19,7 @@ join_array() {
 }
 
 
-print_rhel_notes() {
+function print_rhel_notes() {
     echo "
 Except the Lago repository, no repositories will be configured. Before running
 the script, please ensure you have the below channels enabled:
@@ -34,13 +34,13 @@ use the upstream repository, run:
   "
 }
 
-exit_error() {
+function exit_error() {
     ! [[ -z "$1" ]] && echo "ERROR: $1"
     ! [[ -z "$2" ]] && exit "$2"
     exit 1
 }
 
-check_virtualization() {
+function check_virtualization() {
   if dmesg | grep -q 'kvm: disabled by BIOS'; then
       echo "Please enable virtualization in BIOS"
       exit 1
@@ -49,7 +49,7 @@ check_virtualization() {
   fi
 }
 
-get_cpu_vendor() {
+function get_cpu_vendor() {
   local vendor
   vendor=$(lscpu | awk '/Vendor ID/{print $3}')
   if [[ "$vendor" == 'GenuineIntel' ]]; then
@@ -62,20 +62,20 @@ get_cpu_vendor() {
   fi
 }
 
-check_nested() {
+function check_nested() {
     local mod
     mod="kvm_$1"
     is_enabled=$(cat "/sys/module/$mod/parameters/nested")
     [[ "$is_enabled" == 'Y' ]] && return 0 || return 1
 }
 
-reload_kvm() {
+function reload_kvm() {
     local mod
     mod="kvm-$1"
     (modprobe -r "$mod" && modprobe "$mod") && return 0 || return 1
 }
 
-enable_nested() {
+function enable_nested() {
     local vendor
     vendor=$(get_cpu_vendor)
     if ! check_nested "$vendor"; then
@@ -88,12 +88,12 @@ enable_nested() {
     echo "Nested virtualization is enabled"
 }
 
-install_lago() {
+function install_lago() {
     echo "Installing lago"
     yum install -y lago lago-ovirt
 }
 
-add_lago_repo() {
+function add_lago_repo() {
     local distro
     local distro_str
     distro_str=$(rpm -E "%{?dist}") || exit_error "rpm command not found, only \
@@ -130,7 +130,7 @@ gpgcheck=0
 EOF
 }
 
-post_install_conf_for_lago() {
+function post_install_conf_for_lago() {
     echo "Configuring permissions"
     local user_home
     user_home=$(eval echo "~$INSTALL_USER")
@@ -139,7 +139,7 @@ post_install_conf_for_lago() {
     chmod g+x "$user_home"
 }
 
-enable_libvirt() {
+function enable_libvirt() {
     echo "Enabling services"
     for service in 'libvirtd' 'virtlogd'; do
         (systemctl enable "$service" && \
@@ -148,7 +148,7 @@ enable_libvirt() {
     done
 }
 
-run_suite() {
+function run_suite() {
     sudo -u "$INSTALL_USER" bash <<EOF
 if [[ ! "$SUITE" ]]; then
     exit 0
@@ -173,7 +173,7 @@ fi
 EOF
 }
 
-print_help() {
+function print_help() {
   echo "
 Usage: $0
 $0 [options]
@@ -213,7 +213,7 @@ Optional arguments:
 "
 }
 
-parse_args() {
+function parse_args() {
     local options
     options=$( \
         getopt \
@@ -256,7 +256,7 @@ parse_args() {
 
 }
 
-main() {
+function main() {
     parse_args "$@"
     check_virtualization
     enable_nested
