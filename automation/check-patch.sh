@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-readonly INIT_FILE='automation/init-el73'
+readonly INIT_FILE='automation/lago-init'
 readonly TESTS_PATH='/tmp'
 readonly TIMEOUT="$((10 * 60))"
 

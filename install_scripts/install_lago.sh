@@ -2,6 +2,11 @@
 
 readonly REPONAME="ovirt-system-tests"
 readonly REPOURL="https://gerrit.ovirt.org"
+readonly LAGO_REPO_FILE="/etc/yum.repos.d/lago.repo"
+
+# used for installing ovirt python sdk
+readonly OVIRT_REPO="http://resources.ovirt.org/pub/ovirt-4.1/rpm/"
+readonly OVIRT_REPO_FILE="/etc/yum.repos.d/ovirt-sdk.repo"
 
 readonly RHEL_CHANNELS=(
 'rhel-7-server-rpms'
@@ -9,6 +14,13 @@ readonly RHEL_CHANNELS=(
 'rhel-7-server-extras-rpms'
 'rhel-7-server-rhv-4-mgmt-agent-rpms'
 )
+
+
+if hash dnf &>/dev/null; then
+    readonly PKG_MG="dnf"
+else
+    readonly PKG_MG="yum"
+fi
 
 function join_array() {
     local sep arr
@@ -21,8 +33,11 @@ function join_array() {
 
 function print_rhel_notes() {
     echo "
+
+RHEL notes(None CSB)
+------------------------
 Except the Lago repository, no repositories will be configured. Before running
-the script, please ensure you have the below channels enabled:
+the script, please ensure you have the following channels enabled:
 
 $(join_array "${RHEL_CHANNELS[@]}")
 
@@ -90,32 +105,19 @@ function enable_nested() {
 
 function install_lago() {
     echo "Installing lago"
-    yum install -y lago lago-ovirt
+    "$PKG_MG" install -y lago lago-ovirt
+}
+
+function install_ovirt_sdk() {
+    echo "Installing python-ovirt-engine-sdk4"
+    "$PKG_MG" install -y python-ovirt-engine-sdk4
 }
 
 function add_lago_repo() {
     local distro
-    local distro_str
-    distro_str=$(rpm -E "%{?dist}") || exit_error "rpm command not found, only \
-      RHEL/CentOS/Fedora are supported"
-    echo "Detected distro is $distro_str"
-    if [[ $distro_str =~ ^.el7(_[1-4])?$ ]]; then
-        print_rhel_notes
-        distro="el"
-    elif [[ $distro_str == ".el7.centos" ]]; then
-        distro="el"
-        echo "Adding EPEL repository"
-        yum install -y epel-release
-        echo "Adding centos-qemu-ev repository"
-        yum install -y centos-release-qemu-ev
-    elif [[ $distro_str =~ ^.fc2[45]$ ]]; then
-        distro="fc"
-    else
-        exit_error "Unsupported distro: $distro_str, Supported distros: \
-            fc24, fc25, el7."
-    fi
-    echo "Adding Lago repositories.."
-    cat > /etc/yum.repos.d/lago.repo <<EOF
+    distro="$1"
+    if ! [[ -f "$LAGO_REPO_FILE" ]]; then
+        cat > "$LAGO_REPO_FILE" <<EOF
 [lago]
 baseurl=http://resources.ovirt.org/repos/lago/stable/0.0/rpm/${distro}\$releasever
 name=Lago
@@ -128,7 +130,61 @@ name=ci-tools
 enabled=1
 gpgcheck=0
 EOF
+    else
+        echo "$LAGO_REPO_FILE already exists, not adding."
+    fi
+
 }
+
+function add_ovirt_repo() {
+    local distro
+    distro="$1"
+
+    if ! [[ -f "$OVIRT_REPO_FILE" ]]; then
+        cat > "$OVIRT_REPO_FILE" <<EOF
+[ovirt-41]
+baseurl=$OVIRT_REPO/$distro\$releasever
+name=ovirt
+enabled=1
+gpgcheck=0
+includepkgs=python-ovirt-engine-sdk4
+EOF
+    else
+        echo "$OVIRT_REPO_FILE already exists, not adding."
+    fi
+}
+
+function detect_distro() {
+    local distro_str
+    distro_str=$(rpm -E "%{?dist}") || exit_error "rpm command not found, only \
+      RHEL/CentOS/Fedora are supported"
+    echo "$distro_str"
+}
+
+function add_repos() {
+    local distro_str
+    distro_str="$1"
+    if [[ $distro_str =~ ^.el7(_[1-4])?$ ]]; then
+        print_rhel_notes
+        distro="el"
+    elif [[ $distro_str == ".el7.centos" ]]; then
+        distro="el"
+        "$PKG_MG" install -y epel-release
+        "$PKG_MG" install -y centos-release-qemu-ev
+        add_ovirt_repo "$distro"
+    elif [[ $distro_str =~ ^.fc2[45]$ ]]; then
+        distro="fc"
+        # ovirt python sdk is not available on fc25
+        if [[ $distro_str == ".fc24" ]]; then
+            add_ovirt_repo "$distro"
+        fi
+    else
+        exit_error "Unsupported distro: $distro_str, Supported distros: \
+            fc24, fc25, el7."
+    fi
+    add_lago_repo "$distro"
+}
+
 
 function post_install_conf_for_lago() {
     echo "Configuring permissions"
@@ -178,7 +234,7 @@ function print_help() {
 Usage: $0
 $0 [options]
 
-Lago installation script, supported distros: el7/fc24/fc25
+Lago and Lago-ovirt installation script, supported distros: el7/fc24/fc25
 
 Optionally, you can pass a '--suite' parameter, and it will also download and
 execute one of the available oVirt system tests suites.
@@ -189,12 +245,11 @@ configure a different user, use '--user'.
 
 CentOS notes
 ------------
-Except the Lago repository, it will also install epel-release, which enables
-EPEL repository, and centos-release-qemu-ev, which provides qemu-kvm-ev.
+Except the Lago repository, it will install epel-release, which enables
+EPEL repository, centos-release-qemu-ev, which provides qemu-kvm-ev and the
+oVirt repository, which provides the python oVirt engine SDK v4 package.
 
 
-RHEL notes
-----------
 $(print_rhel_notes)
 
 
@@ -257,11 +312,16 @@ function parse_args() {
 }
 
 function main() {
+    local distro_str
     parse_args "$@"
     check_virtualization
     enable_nested
-    add_lago_repo
+    distro_str="$(detect_distro)"
+    add_repos "$distro_str"
     install_lago
+    if ! [[ "$distro_str" == ".fc25" ]]; then
+        install_ovirt_sdk
+    fi
     post_install_conf_for_lago
     enable_libvirt
     echo "Finished installing and configuring Lago for user $INSTALL_USER."
