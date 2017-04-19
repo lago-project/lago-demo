@@ -1,12 +1,13 @@
 #!/bin/bash -ex
 
-readonly INIT_FILE='automation/init-el73'
+readonly INIT_FILE='automation/lago-init'
 readonly TESTS_PATH='/tmp'
 readonly TIMEOUT="$((10 * 60))"
 
 function set_params() {
     ! [[ -c "/dev/kvm" ]] && mknod /dev/kvm c 10 232
     export LIBGUESTFS_BACKEND=direct
+    export LIBGUESTFS_DEBUG=1 LIBGUESTFS_TRACE=1
     mkdir -p "$PWD/exported-artifacts"
 }
 
