@@ -15,6 +15,8 @@ EOF
 
 function main() {
     check_sdk4 "$USERNAME"
+    echo "FAILING!!!!!!!!!"
+    exit 1
 }
 
 main "$@"

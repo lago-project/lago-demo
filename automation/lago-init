@@ -14,22 +14,6 @@ domains:
       - /var/log
       - /home/custom_home/dummy_user/.lago/current/logs
 
-  vm-el72:
-    memory: 2048
-    service_provider: systemd
-    nics:
-      - net: lago
-    disks:
-      - template_name: el7-base
-        type: template
-        name: root
-        dev: vda
-        format: qcow2
-    artifacts:
-      - /var/log
-      - /home/custom_home/dummy_user/.lago/current/logs
-
-
   vm-fc24:
     memory: 2048
     service_provider: systemd
