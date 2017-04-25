@@ -19,7 +19,7 @@ EOF
 }
 
 function main() {
-    start_vm "$USERNAME" || exit $?
+    start_vm "$USERNAME"
 }
 
 main "$@"
