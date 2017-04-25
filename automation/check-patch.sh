@@ -41,7 +41,7 @@ function run_tests() {
     for test in "${tests[@]}"; do
         lago shell "$vm" -c "$tests_path/$test/run.sh |& \
             tee -a /var/log/test_$test.log; \
-            exit ${PIPESTATUS[0]}" || exit $?
+            exit \${PIPESTATUS[0]}" || exit $?
     done
 }
 
