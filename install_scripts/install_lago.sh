@@ -87,7 +87,13 @@ function check_nested() {
 function reload_kvm() {
     local mod
     mod="kvm-$1"
-    (modprobe -r "$mod" && modprobe "$mod") && return 0 || return 1
+    echo "Reloading kvm kernel module"
+    (modprobe -r "$mod" && \
+        modprobe -r "kvm" && \
+        modprobe "kvm" && \
+        modprobe "$mod" ) && \
+        return 0 || \
+        return 1
 }
 
 function enable_nested() {
@@ -193,6 +199,7 @@ function post_install_conf_for_lago() {
     usermod -a -G lago,qemu "$INSTALL_USER"
     usermod -a -G "$INSTALL_USER" qemu
     chmod g+x "$user_home"
+    reload_kvm "$(get_cpu_vendor)"
 }
 
 function enable_service() {
