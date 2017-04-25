@@ -164,7 +164,7 @@ function detect_distro() {
 function add_repos() {
     local distro_str
     distro_str="$1"
-    if [[ $distro_str =~ ^.el7(_[1-4])?$ ]]; then
+    if [[ $distro_str =~ ^.el7(ev)?(_[1-4])?$ ]]; then
         print_rhel_notes
         distro="el"
     elif [[ $distro_str == ".el7.centos" ]]; then
