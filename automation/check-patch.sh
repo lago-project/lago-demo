@@ -36,12 +36,10 @@ function run_tests() {
     tests_path=${args[-1]} && unset "args[${#args[@]} -1]"
     vm=${args[-1]} && unset "args[${#args[@]} -1]"
     tests=(${args[@]})
-    # TO-DO: figure out why here the exit code does not propagate,
-    # requiring the explicit '|| exit $?'.
     for test in "${tests[@]}"; do
         lago shell "$vm" -c "$tests_path/$test/run.sh |& \
             tee -a /var/log/test_$test.log; \
-            exit \${PIPESTATUS[0]}" || exit $?
+            exit \${PIPESTATUS[0]}"
     done
 }
 
