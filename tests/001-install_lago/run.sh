@@ -15,8 +15,8 @@ function setup_user() {
 }
 
 function main() {
-    setup_user "$USERNAME" "$CUSTOM_HOME" || exit $?
-    sudo su "$USERNAME" -l -c "sudo $INSTALL_SCRIPT --user $USERNAME" || exit $?
+    setup_user "$USERNAME" "$CUSTOM_HOME"
+    sudo su "$USERNAME" -l -c "sudo $INSTALL_SCRIPT --user $USERNAME"
 }
 
 main "$@"
