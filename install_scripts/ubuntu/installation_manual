@@ -1,0 +1,74 @@
+Installing Lago on Ubuntu
+==========================
+
+About
+-----
+In this document you will find the required steps in order
+to install Lago on Ubuntu machine (tested on Ubuntu 16.04).
+
+Lago and some of its deps will be installed using pip. Other deps will be installed using apt-get.
+
+Most of the steps that will be described in this document will be automated in the future.
+
+Requirements
+--------------
+
+- You should clone `lago's repo <https://github.com/lago-project/lago>`_.
+- Download `requirement.txt <https://github.com/lago-project/lago-demo/blob/lago_for_ubuntu/install_scripts/ubuntu/requirements.txt>`_ (python deps).
+- Download `.deb deps installation script <https://github.com/lago-project/lago-demo/blob/lago_for_ubuntu/install_scripts/ubuntu/install_deb_deps.sh>`_.
+- pip installed on the machine.
+
+Steps
+------
+
+- Install .deb deps with install_deb_deps.sh
+- Within lago's repo, create a python package for lago with the following command:
+
+::
+
+ python setup.py sdist
+
+TODO: Make lago available on PyPi.
+- Install lago's package:
+
+::
+
+ pip install dist/lago-{version}.tar.gz`
+
+- Install lago's python requirements:
+
+::
+
+ pip install -r requirements.txt`
+
+- Setup permissions to /boot/vmlinuz (required by libguestfs: http://libguestfs.org/guestfs-faq.1.html#binaries)
+
+::
+
+ sudo chmod 0644 /boot/vmlinuz*`
+
+- Create a symlink named /usr/bin/qemu-kvm to /usr/bin/
+
+::
+
+ ln -s /usr/bin/ /usr/bin/qemu-kvm`
+
+- Create a new group called 'lago', and insert your user into it:
+
+::
+
+ groupadd lago; usermod -aG lago {YOUR_USERNAME}`
+
+- Create 'lago' directory in /var/lib, and change its group to 'lago'
+
+::
+
+ mkdir /var/lib/lago; chgrp lago /var/lib/lago'
+
+- Apparmor configuration: if you want to store lago images under /var/lib/lago/store, you will need to configure apparmor:
+
+::
+
+ apt-get install apparmor-utils; aa-complain /usr/lib/libvirt/virt-aa-helper
+
+- If you don't want to make changes to apparmor, you can change the location in which the images will be stored. The change should be done in /etc/lago.d/lago.conf
