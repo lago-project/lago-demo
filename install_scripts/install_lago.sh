@@ -195,14 +195,22 @@ function post_install_conf_for_lago() {
     chmod g+x "$user_home"
 }
 
-function enable_libvirt() {
-    echo "Enabling services"
-    for service in 'libvirtd' 'virtlogd'; do
-        (systemctl enable "$service" && \
-            systemctl start "$service") || \
+function enable_service() {
+    local service
+    service="$1"
+    (systemctl enable "$service" && \
+     systemctl restart "$service") || \
             exit_error "faild to start service $service"
-    done
 }
+
+function enable_services() {
+    enable_service "libvirtd"
+    enable_service "firewalld"
+    # see: https://bugzilla.redhat.com/show_bug.cgi?id=1290357
+    systemctl cat "virtlogd.service" &> /dev/null && \
+        enable_service "virtlogd"
+}
+
 
 function run_suite() {
     sudo -u "$INSTALL_USER" bash <<EOF
@@ -323,7 +331,7 @@ function main() {
         install_ovirt_sdk
     fi
     post_install_conf_for_lago
-    enable_libvirt
+    enable_services
     echo "Finished installing and configuring Lago for user $INSTALL_USER."
     run_suite
 }
