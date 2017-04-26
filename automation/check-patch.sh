@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-readonly INIT_FILE='automation/lago-init'
+readonly INIT_FILE='automation/lago-init.yaml'
 readonly TESTS_PATH='/tmp'
 readonly TIMEOUT="$((10 * 60))"
 
@@ -12,9 +12,11 @@ function set_params() {
 }
 
 function start_env() {
-    lago init "$INIT_FILE"
-    lago start
+    lago --loglevel=debug --logdepth=5 init "$INIT_FILE"
+    lago start && trap "cleanup" EXIT
+    lago deploy
 }
+
 
 function copy_test_to_vm() {
     set -ex
@@ -62,7 +64,6 @@ function main() {
     local vms
     set_params
     start_env
-    trap "cleanup" EXIT
 
     vms=($(get_vm_names))
     tests=($(ls "$PWD/tests"))
