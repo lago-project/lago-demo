@@ -211,8 +211,8 @@ function enable_service() {
 }
 
 function enable_services() {
-    enable_service "libvirtd"
     enable_service "firewalld"
+    enable_service "libvirtd"
     # see: https://bugzilla.redhat.com/show_bug.cgi?id=1290357
     systemctl cat "virtlogd.service" &> /dev/null && \
         enable_service "virtlogd"
