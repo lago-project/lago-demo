@@ -12,6 +12,8 @@ function start_vm() {
 bash -ex << EOS
 export LIBGUESTFS_BACKEND=direct
 export LIBGUESTFS_DEBUG=1 LIBGUESTFS_TRACE=1
+lago --version
+lago ovirt --help
 lago init $INIT_FILE
 lago start
 lago shell nested -c 'hostname' && lago destroy --yes

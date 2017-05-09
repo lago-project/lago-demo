@@ -125,7 +125,7 @@ function add_lago_repo() {
     if ! [[ -f "$LAGO_REPO_FILE" ]]; then
         cat > "$LAGO_REPO_FILE" <<EOF
 [lago]
-baseurl=http://resources.ovirt.org/repos/lago/stable/0.0/rpm/${distro}\$releasever
+baseurl=http://resources.ovirt.org/repos/lago/unstable/0.0/latest/rpm/${distro}\$releasever
 name=Lago
 enabled=1
 gpgcheck=0
