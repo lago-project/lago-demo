@@ -199,7 +199,6 @@ function post_install_conf_for_lago() {
     usermod -a -G lago,qemu "$INSTALL_USER"
     usermod -a -G "$INSTALL_USER" qemu
     chmod g+x "$user_home"
-    reload_kvm "$(get_cpu_vendor)"
 }
 
 function enable_service() {
@@ -273,6 +272,10 @@ Optional arguments:
         Setup the necessary permissions for the specified user in order to run
         Lago. By default, it will use the output of 'logname'.
 
+    -p,--permissions-only
+        Only setup the necessary permissions for the user and exit. This must
+        be called after Lago was already installed.
+
     -s,--suite SUITENAME
         Name of oVirt system tests suite to clone and execute, for available
         lists of suites, see:
@@ -287,8 +290,8 @@ function parse_args() {
     local options
     options=$( \
         getopt \
-            -o hu:s: \
-            --long help,user:,suite: \
+            -o hpu:s: \
+            --long help,permissions-only,user:,suite: \
             -n 'install_lago.sh' \
             -- "$@" \
     )
@@ -302,6 +305,10 @@ function parse_args() {
             -s|--suite)
                 SUITE="$2"
                 shift 2
+                ;;
+            -p|--permissions-only)
+                readonly PERMS_ONLY=true
+                shift 1
                 ;;
             -h|--help)
                 print_help && exit 0
@@ -329,6 +336,12 @@ function parse_args() {
 function main() {
     local distro_str
     parse_args "$@"
+    if [[ "$PERMS_ONLY" == true ]]; then
+        echo "Only configuring permissions for user $INSTALL_USER"
+        post_install_conf_for_lago
+        echo "Done."
+        exit 0
+    fi
     check_virtualization
     enable_nested
     distro_str="$(detect_distro)"
@@ -338,6 +351,7 @@ function main() {
         install_ovirt_sdk
     fi
     post_install_conf_for_lago
+    reload_kvm "$(get_cpu_vendor)"
     enable_services
     echo "Finished installing and configuring Lago for user $INSTALL_USER."
     run_suite

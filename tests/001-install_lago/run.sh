@@ -2,6 +2,7 @@
 
 readonly RUN_DIR="$(dirname "${BASH_SOURCE[0]}")"
 readonly USERNAME="dummy_user"
+readonly SECONDARY_USER="dummy_user2"
 readonly CUSTOM_HOME="custom_home"
 readonly INSTALL_SCRIPT="$RUN_DIR/install_lago.sh"
 
@@ -16,7 +17,10 @@ function setup_user() {
 
 function main() {
     setup_user "$USERNAME" "$CUSTOM_HOME"
+    setup_user "$SECONDARY_USER" "$CUSTOM_HOME"
     sudo su "$USERNAME" -l -c "sudo bash -ex $INSTALL_SCRIPT --user $USERNAME"
+    sudo su "$SECONDARY_USER" -l -c \
+        "sudo bash -ex $INSTALL_SCRIPT -p --user $SECONDARY_USER"
 }
 
 main "$@"
