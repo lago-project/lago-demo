@@ -2,7 +2,7 @@
 
 readonly INIT_FILE='automation/lago-init.yaml'
 readonly TESTS_PATH='/tmp'
-readonly TIMEOUT="$((10 * 60))"
+readonly TIMEOUT="$((17 * 60))"
 
 function set_params() {
     ! [[ -c "/dev/kvm" ]] && mknod /dev/kvm c 10 232
