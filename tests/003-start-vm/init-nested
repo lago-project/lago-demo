@@ -12,7 +12,7 @@ domains:
         format: qcow2
 nets:
   lago-nested:
-    gw: 192.168.22.1
+    gw: 192.168.210.1
     type: nat
     dhcp:
       start: 100
