@@ -5,7 +5,6 @@ readonly USERNAME="dummy_user"
 
 function check_services() {
     systemctl is-active libvirtd
-    systemctl is-active firewalld
 }
 
 function virt_checks() {
