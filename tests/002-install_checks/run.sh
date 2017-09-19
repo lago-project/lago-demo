@@ -15,7 +15,7 @@ function virt_checks() {
     libguestfs-test-tool
 }
 
-function check_ovirt_sdk4() {
+function _check_ovirt_sdk4() {
     local username
     username="$1"
     sudo su "$username" -l << EOF
@@ -23,6 +23,18 @@ bash -ex << EOS
 python -c 'import ovirtsdk4; from ovirtsdk4 import version; print version.VERSION'
 EOS
 EOF
+}
+
+function check_ovirt_sdk4() {
+    # Remove once sdk4 is available for fc2[56]
+    local distro_str=$(rpm -E "%{?dist}")
+
+    if [[ $distro_str =~ ^.fc2[56]$ ]]; then
+        echo "oVirt SDK v4 isn't available on fc2[56], skipping"
+        return
+    fi
+
+    _check_ovirt_sdk4 "$1"
 }
 
 function main() {
