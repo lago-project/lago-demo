@@ -1,11 +1,11 @@
 domains:
-  vm-el73:
+  vm-el74:
     memory: 2048
     service_provider: systemd
     nics:
       - net: lago
     disks:
-      - template_name: el7.3-base
+      - template_name: el7.4-base
         type: template
         name: root
         dev: sda
