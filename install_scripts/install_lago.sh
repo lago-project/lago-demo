@@ -178,15 +178,15 @@ function add_repos() {
         "$PKG_MG" install -y epel-release
         "$PKG_MG" install -y centos-release-qemu-ev
         add_ovirt_repo "$distro"
-    elif [[ $distro_str =~ ^.fc2[45]$ ]]; then
+    elif [[ $distro_str =~ ^.fc2[456]$ ]]; then
         distro="fc"
-        # ovirt python sdk is not available on fc25
+        # ovirt python sdk is not available on fc25/26
         if [[ $distro_str == ".fc24" ]]; then
             add_ovirt_repo "$distro"
         fi
     else
         exit_error "Unsupported distro: $distro_str, Supported distros: \
-            fc24, fc25, el7."
+            fc24, fc25, fc26, el7."
     fi
     add_lago_repo "$distro"
 }
@@ -351,7 +351,7 @@ function main() {
     distro_str="$(detect_distro)"
     add_repos "$distro_str"
     install_lago
-    if ! [[ "$distro_str" == ".fc25" ]]; then
+    if ! [[ "$distro_str" =~ ^.fc2[56]$ ]]; then
         install_ovirt_sdk
     fi
     post_install_conf_for_lago
