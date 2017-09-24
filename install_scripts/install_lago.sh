@@ -217,6 +217,10 @@ function enable_services() {
         enable_service "virtlogd"
 }
 
+function configure_ipv6_networking() {
+    echo "net.ipv6.conf.all.accept_ra=2" >> "/etc/sysctl.conf"
+    sysctl -p
+}
 
 function run_suite() {
     sudo -u "$INSTALL_USER" bash <<EOF
@@ -353,6 +357,7 @@ function main() {
     post_install_conf_for_lago
     reload_kvm "$(get_cpu_vendor)"
     enable_services
+    configure_ipv6_networking
     echo "Finished installing and configuring Lago for user $INSTALL_USER."
     run_suite
 }
