@@ -1,0 +1,2 @@
+local_install_script: install_scripts/install_lago.sh
+remote_install_script: /tmp/install_lago.sh

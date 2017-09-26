@@ -1,0 +1,9 @@
+- hosts: all
+  any_errors_fatal: true
+  vars_files:
+    - vars.yaml
+  roles:
+    - { role: lago_host, tags: 'lago_host' }
+    - { role: verify_install, tags: 'verify_install' }
+    - { role: run_lago_env, tags: 'run_lago_env' }
+    - { role: upgrade, tags: 'upgrade'}

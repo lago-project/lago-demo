@@ -1,0 +1,3 @@
+dist_mapping:
+  Fedora: fc
+  CentOS: el

@@ -1,0 +1,18 @@
+- name: Copy init file to remote hosts
+  template:
+    src: init-nested.j2
+    dest: "{{ remote_init_dir }}/init-nested"
+    mode: 0666
+
+- name: Run Lago env
+  script: >
+    run_env.sh
+      "{{ remote_init_dir }}"
+      init-nested
+      "{{ template_repo }}"
+      "{{ log_path }}"
+  become: yes
+  become_user: "{{ item }}"
+  with_items:
+    - "{{ primary_user }}"
+    - "{{ secondary_user }}"

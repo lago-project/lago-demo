@@ -1,0 +1,27 @@
+*.pyc
+.*.swp
+.bash_history
+logs*
+test_logs/
+mocker-*
+
+#IDE files
+##########
+.settings
+.project
+.factorypath
+.externalToolBuilders
+.pmd
+*.ipr
+*.iml
+.idea
+.pydevproject
+
+# Ansible files
+###############
+*.retry
+inventory
+
+# Lago files
+##############
+.lago

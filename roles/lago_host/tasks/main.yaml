@@ -1,0 +1,38 @@
+- name: Make sure 'wheel' group exist
+  group:
+    name: wheel
+
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: visudo -cf %s
+
+- name: Create users
+  user:
+    name: "{{ item }}"
+    groups: wheel
+  with_items:
+    - "{{ primary_user }}"
+    - "{{ secondary_user }}"
+
+- name: Copy lago's install script to the remote machine
+  copy:
+    src: "{{ local_install_script }}"
+    dest: "{{ remote_install_script }}"
+    mode: 0777
+
+- name: Install lago with primary user
+  shell: "sudo bash -ex {{ remote_install_script }} --user {{ primary_user }}"
+  args:
+    creates: "/usr/lib/python2.7/site-packages/lago/cmd.py"
+  become: yes
+  become_user: "{{ primary_user }}"
+
+- name: Configure secondary user
+  shell: >
+    sudo bash -ex "{{ remote_install_script }}"
+    -p --user "{{ secondary_user }}"
+  become: yes
+  become_user: "{{ secondary_user }}"

@@ -1,0 +1,5 @@
+[lago-unstable]
+baseurl=http://resources.ovirt.org/repos/lago/unstable/0.0/latest/rpm/{{ dist_type }}\$releasever
+name=Lago
+enabled=1
+gpgcheck=0
