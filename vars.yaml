@@ -3,3 +3,4 @@ secondary_user: dummy_user2
 run_path: "/tmp"
 log_path: "/var/log"
 template_repo: "http://templates.ovirt.org/repo/repo.metadata"
+nested_vm_template: el7.4-base
