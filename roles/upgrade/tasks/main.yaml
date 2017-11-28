@@ -1,0 +1,56 @@
+- name: Copy init file to remote hosts
+  template:
+    src: init-nested.j2
+    dest: "{{ remote_init_dir }}/init-nested"
+    mode: 0666
+
+- name: Create lago env with stable
+  script: >
+    run_env_pre_upgrade.sh
+      "{{ remote_init_dir }}"
+      init-nested
+      "{{ template_repo }}"
+      "{{ log_path }}"
+  become: yes
+  become_user: "{{ primary_user }}"
+  tags: never
+
+- name: Upgrade lago to unstable
+  block:
+    - set_fact:
+        dist_type: "{{ dist_mapping[ansible_distribution] }}"
+    - template:
+        src: lago_unstable.repo
+        dest: /etc/yum.repos.d/
+        mode: 0644
+    - yum:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+        - lago
+        - lago-ovirt
+      register: update_task
+
+- name: Print update status
+  debug:
+    msg: Already has latests version of lago, skipping upgrade tests
+  when: not update_task.changed
+
+- name: Test upgrade
+  block:
+  - name: Start stable env with unstable lago_host
+    script: >
+      run_env_post_upgrade.sh
+        "{{ remote_init_dir }}"
+        init-nested
+        "{{ log_path }}"
+  - name: Create env with unstable lago
+    script: >
+      run_env.sh
+        "{{ remote_init_dir }}"
+        init-nested
+        "{{ template_repo }}"
+        "{{ log_path }}"
+  become: yes
+  become_user: "{{ primary_user }}"
+  when: update_task.changed

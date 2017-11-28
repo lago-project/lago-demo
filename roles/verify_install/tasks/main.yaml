@@ -1,0 +1,26 @@
+- name: Get KVM info
+  shell: getfacl /dev/kvm > "{{ log_path }}/kvm-info.log"
+  register: kvm_info
+
+- name: Verify that Libvirtd is running
+  shell: systemctl is-active libvirtd
+
+- name: Get virtualization configurations
+  shell: virt-host-validate > "{{ log_path }}/virt-config.log"
+  register: virt_config
+  ignore_errors: yes
+
+- name: Verify Libguestfs
+  shell: libguestfs-test-tool > "{{ log_path }}/libguestfs-test-tool.log"
+
+- name: Check host distro
+  set_fact:
+    distro: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}"
+
+# Remove once sdk4 is available for fc2[56]
+- name: Verify that oVirt SDKv4 is installed
+  shell: >
+    python -c 'import ovirtsdk4;
+    from ovirtsdk4 import version;
+    print version.VERSION'
+  when: distro not in skip_sdk_v4_verification

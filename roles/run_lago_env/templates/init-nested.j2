@@ -5,7 +5,7 @@ domains:
     nics:
       - net: lago-nested
     disks:
-      - template_name: el7.3-base
+      - template_name: {{ nested_vm_template }}
         type: template
         name: root
         dev: vda

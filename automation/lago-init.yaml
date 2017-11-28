@@ -1,5 +1,5 @@
 domains:
-  vm-el74:
+  lago-vm-el74:
     memory: 2048
     service_provider: systemd
     nics:
@@ -23,13 +23,37 @@ domains:
       deploy-scripts:
         - $LAGO_INITFILE_PATH/deploy.sh
 
-  vm-fc24:
+  lago-vm-fc25:
     memory: 2048
     service_provider: systemd
     nics:
       - net: lago
     disks:
-      - template_name: fc24-base
+      - template_name: fc25-base
+        type: template
+        name: root
+        dev: sda
+        format: qcow2
+      - comment: /var/lib/lago
+        size: 10G
+        type: empty
+        name: lib
+        dev: sdb
+        format: qcow2
+    artifacts:
+      - /var/log
+      - /home/custom_home/dummy_user/.lago/current/logs
+    metadata:
+      deploy-scripts:
+        - $LAGO_INITFILE_PATH/deploy.sh
+
+  lago-vm-fc26:
+    memory: 2048
+    service_provider: systemd
+    nics:
+      - net: lago
+    disks:
+      - template_name: fc26-base
         type: template
         name: root
         dev: sda
