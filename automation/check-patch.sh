@@ -51,7 +51,7 @@ force_cleanup() {
 
 function main() {
     set_params
-    start_env && trap "cleanup" EXIT
+    start_env
     ansible-playbook \
         -u root \
         -i inventory \
@@ -59,4 +59,5 @@ function main() {
         test-playbook.yaml
 }
 
+trap "cleanup" EXIT
 main
