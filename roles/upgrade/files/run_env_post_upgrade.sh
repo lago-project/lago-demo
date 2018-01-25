@@ -3,9 +3,9 @@
 # export LIBGUESTFS_BACKEND=direct
 # export LIBGUESTFS_DEBUG=1 LIBGUESTFS_TRACE=1
 
-init_file_dir="$1"
-init_file_name="$2"
-log_dir="$3"
+init_file_dir="${1:?}"
+init_file_name="${2:?}"
+log_dir="${3:?}"
 log_path="${log_dir}/${0##*/}-$(whoami)-lago.log"
 
 echo "$PWD"
