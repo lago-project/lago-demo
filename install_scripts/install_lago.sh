@@ -5,7 +5,7 @@ readonly REPOURL="https://gerrit.ovirt.org"
 readonly LAGO_REPO_FILE="/etc/yum.repos.d/lago.repo"
 
 # used for installing ovirt python sdk
-readonly OVIRT_REPO="http://resources.ovirt.org/pub/ovirt-4.1/rpm/"
+readonly OVIRT_REPO="http://resources.ovirt.org/pub/ovirt-4.2/rpm/"
 readonly OVIRT_REPO_FILE="/etc/yum.repos.d/ovirt-sdk.repo"
 
 readonly RHEL_CHANNELS=(
