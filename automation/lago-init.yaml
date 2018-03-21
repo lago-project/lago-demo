@@ -1,75 +1,63 @@
+common_vm_params: &common_vm_params
+  memory: 2048
+  service_provider: systemd
+  nics:
+    - net: lago
+  artifacts:
+    - /var/log
+    - /home/custom_home/dummy_user/.lago/current/logs
+  metadata:
+    deploy-scripts:
+      - $LAGO_INITFILE_PATH/deploy.sh
+
+storage_disk: &storage_disk
+  comment: /var/lib/lago
+  size: 10G
+  type: empty
+  name: lib
+  dev: sdb
+  format: qcow2
+
 domains:
   lago-vm-el74:
-    memory: 2048
-    service_provider: systemd
-    nics:
-      - net: lago
+    <<: *common_vm_params
     disks:
       - template_name: el7.4-base
         type: template
         name: root
         dev: sda
         format: qcow2
-      - comment: /var/lib/lago
-        size: 10G
-        type: empty
-        name: lib
-        dev: sdb
-        format: qcow2
-    artifacts:
-      - /var/log
-      - /home/custom_home/dummy_user/.lago/current/logs
-    metadata:
-      deploy-scripts:
-        - $LAGO_INITFILE_PATH/deploy.sh
+      - *storage_disk
 
   lago-vm-fc25:
-    memory: 2048
-    service_provider: systemd
-    nics:
-      - net: lago
+    <<: *common_vm_params
     disks:
       - template_name: fc25-base
         type: template
         name: root
         dev: sda
         format: qcow2
-      - comment: /var/lib/lago
-        size: 10G
-        type: empty
-        name: lib
-        dev: sdb
-        format: qcow2
-    artifacts:
-      - /var/log
-      - /home/custom_home/dummy_user/.lago/current/logs
-    metadata:
-      deploy-scripts:
-        - $LAGO_INITFILE_PATH/deploy.sh
+      - *storage_disk
 
   lago-vm-fc26:
-    memory: 2048
-    service_provider: systemd
-    nics:
-      - net: lago
+    <<: *common_vm_params
     disks:
       - template_name: fc26-base
         type: template
         name: root
         dev: sda
         format: qcow2
-      - comment: /var/lib/lago
-        size: 10G
-        type: empty
-        name: lib
-        dev: sdb
+      - *storage_disk
+
+  lago-vm-fc27:
+    <<: *common_vm_params
+    disks:
+      - template_name: fc27-base
+        type: template
+        name: root
+        dev: sda
         format: qcow2
-    artifacts:
-      - /var/log
-      - /home/custom_home/dummy_user/.lago/current/logs
-    metadata:
-      deploy-scripts:
-        - $LAGO_INITFILE_PATH/deploy.sh
+      - *storage_disk
 nets:
   lago:
     type: nat

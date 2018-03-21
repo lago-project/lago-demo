@@ -15,6 +15,8 @@ readonly RHEL_CHANNELS=(
 'rhel-7-server-rhv-4-mgmt-agent-rpms'
 )
 
+readonly SUPPORTED_DISTROS="fc25, fc26, fc27, el7"
+readonly FEDORA_RGX="^.fc2[567]$"
 
 if hash dnf &>/dev/null; then
     readonly PKG_MG="dnf"
@@ -178,15 +180,11 @@ function add_repos() {
         "$PKG_MG" install -y epel-release
         "$PKG_MG" install -y centos-release-qemu-ev
         add_ovirt_repo "$distro"
-    elif [[ $distro_str =~ ^.fc2[456]$ ]]; then
+    elif [[ $distro_str =~ $FEDORA_RGX ]]; then
         distro="fc"
-        # ovirt python sdk is not available on fc25/26
-        if [[ $distro_str == ".fc24" ]]; then
-            add_ovirt_repo "$distro"
-        fi
     else
         exit_error "Unsupported distro: $distro_str, Supported distros: \
-            fc24, fc25, fc26, el7."
+            ${SUPPORTED_DISTROS}"
     fi
     add_lago_repo "$distro"
 }
@@ -252,7 +250,7 @@ function print_help() {
 Usage: $0
 $0 [options]
 
-Lago and Lago-ovirt installation script, supported distros: el7/fc24/fc25
+Lago and Lago-ovirt installation script, supported distros: ${SUPPORTED_DISTROS}
 
 Optionally, you can pass a '--suite' parameter, and it will also download and
 execute one of the available oVirt system tests suites.
@@ -351,7 +349,7 @@ function main() {
     distro_str="$(detect_distro)"
     add_repos "$distro_str"
     install_lago
-    if ! [[ "$distro_str" =~ ^.fc2[56]$ ]]; then
+    if ! [[ "$distro_str" =~ $FEDORA_RGX ]]; then
         install_ovirt_sdk
     fi
     post_install_conf_for_lago
