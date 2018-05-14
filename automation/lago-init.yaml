@@ -22,7 +22,7 @@ domains:
   lago-vm-el74:
     <<: *common_vm_params
     disks:
-      - template_name: el7.4-base
+      - template_name: el7.5-base
         type: template
         name: root
         dev: sda
@@ -32,7 +32,7 @@ domains:
   lago-vm-fc26:
     <<: *common_vm_params
     disks:
-      - template_name: fc26-base
+      - template_name: fc27-base
         type: template
         name: root
         dev: sda
@@ -42,7 +42,7 @@ domains:
   lago-vm-fc27:
     <<: *common_vm_params
     disks:
-      - template_name: fc27-base
+      - template_name: fc28-base
         type: template
         name: root
         dev: sda
