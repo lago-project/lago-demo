@@ -220,6 +220,10 @@ function configure_ipv6_networking() {
     sysctl -p
 }
 
+function ensure_ost_dependencies() {
+    $PKG_MG install -y python-virtualenv
+}
+
 function run_suite() {
     sudo -u "$INSTALL_USER" bash <<EOF
 if [[ ! "$SUITE" ]]; then
@@ -357,6 +361,7 @@ function main() {
     enable_services
     configure_ipv6_networking
     echo "Finished installing and configuring Lago for user $INSTALL_USER."
+    ensure_ost_dependencies
     run_suite
 }
 
