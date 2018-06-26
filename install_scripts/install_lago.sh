@@ -6,6 +6,7 @@ readonly LAGO_REPO_FILE="/etc/yum.repos.d/lago.repo"
 
 # used for installing ovirt python sdk
 readonly OVIRT_REPO="http://resources.ovirt.org/pub/ovirt-4.2/rpm/"
+readonly OVIRT_VERSION="$(echo "$OVIRT_REPO" | grep -o ovirt-[^/]*)"
 readonly OVIRT_REPO_FILE="/etc/yum.repos.d/ovirt-sdk.repo"
 
 readonly RHEL_CHANNELS=(
@@ -152,7 +153,7 @@ function add_ovirt_repo() {
 
     if ! [[ -f "$OVIRT_REPO_FILE" ]]; then
         cat > "$OVIRT_REPO_FILE" <<EOF
-[ovirt-41]
+[ovirt-$OVIRT_VERSION]
 baseurl=$OVIRT_REPO/$distro\$releasever
 name=ovirt
 enabled=1
