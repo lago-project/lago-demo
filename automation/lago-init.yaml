@@ -19,10 +19,10 @@ storage_disk: &storage_disk
   format: qcow2
 
 domains:
-  lago-vm-el74:
+  lago-vm-el75:
     <<: *common_vm_params
     disks:
-      - template_name: el7.4-base
+      - template_name: el7.5-base
         type: template
         name: root
         dev: sda
