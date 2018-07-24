@@ -29,16 +29,6 @@ domains:
         format: qcow2
       - *storage_disk
 
-  lago-vm-fc26:
-    <<: *common_vm_params
-    disks:
-      - template_name: fc26-base
-        type: template
-        name: root
-        dev: sda
-        format: qcow2
-      - *storage_disk
-
   lago-vm-fc27:
     <<: *common_vm_params
     disks:

@@ -15,8 +15,8 @@ readonly RHEL_CHANNELS=(
 'rhel-7-server-rhv-4-mgmt-agent-rpms'
 )
 
-readonly SUPPORTED_DISTROS="fc26, fc27, el7"
-readonly FEDORA_RGX="^.fc2[67]$"
+readonly SUPPORTED_DISTROS="fc27, el7"
+readonly FEDORA_RGX="^.fc2[7]$"
 
 if hash dnf &>/dev/null; then
     readonly PKG_MG="dnf"
