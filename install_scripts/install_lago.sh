@@ -16,7 +16,9 @@ readonly RHEL_CHANNELS=(
 )
 
 readonly SUPPORTED_DISTROS="fc27, el7"
-readonly FEDORA_RGX="^.fc2[7]$"
+readonly RHEL_RGX="^rhel7.*$"
+readonly CENTOS_RGX="^centos7.*$"
+readonly FEDORA_RGX="^fedora2[7]$"
 
 if hash dnf &>/dev/null; then
     readonly PKG_MG="dnf"
@@ -163,24 +165,42 @@ EOF
 }
 
 function detect_distro() {
-    local distro_str
-    distro_str=$(rpm -E "%{?dist}") || exit_error "rpm command not found, only \
-      RHEL/CentOS/Fedora are supported"
-    echo "$distro_str"
+    local distro
+    local os_release=("/etc/os-release" "/usr/lib/os-release")
+
+    function get_distro_from_os_release() {
+        local osr="${1:?}"
+
+        unset ID VERSION_ID
+        source "$osr" || return 1
+        [[ "$ID" ]] \
+        && [[ "$VERSION_ID" ]] \
+        && echo "${ID}${VERSION_ID}" \
+        && return
+
+        return 1
+    }
+
+    for p in "${os_release[@]}"; do
+        distro="$(get_distro_from_os_release "$p")" && echo "$distro" && return
+    done
+
+    exit_error "Couldn't detect OS' distro, failed to read ID, VERSION_ID  \
+        fields from the following files ${os_release[*]}"
 }
 
 function add_repos() {
     local distro_str
     distro_str="$1"
-    if [[ $distro_str =~ ^.el7(ev)?(_[1-4])?$ ]]; then
+    if [[ "$distro_str" =~ $RHEL_RGX ]]; then
         print_rhel_notes
         distro="el"
-    elif [[ $distro_str == ".el7.centos" ]]; then
+    elif [[ "$distro_str" =~ $CENTOS_RGX ]]; then
         distro="el"
         "$PKG_MG" install -y epel-release
         "$PKG_MG" install -y centos-release-qemu-ev
         add_ovirt_repo "$distro"
-    elif [[ $distro_str =~ $FEDORA_RGX ]]; then
+    elif [[ "$distro_str" =~ $FEDORA_RGX ]]; then
         distro="fc"
     else
         exit_error "Unsupported distro: $distro_str, Supported distros: \
