@@ -117,8 +117,10 @@ function enable_nested() {
 
 function install_lago() {
     echo "Installing lago"
-    "$PKG_MG" install -y lago lago-ovirt
-}
+    for pkg in "lago" "lago-ovirt"; do
+        "$PKG_MG" install -y "$pkg"
+    done
+   }
 
 function install_ovirt_sdk() {
     echo "Installing python-ovirt-engine-sdk4"
