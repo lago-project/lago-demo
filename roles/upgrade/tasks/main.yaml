@@ -5,12 +5,7 @@
     mode: 0666
 
 - name: Create lago env with stable
-  script: >
-    run_env_pre_upgrade.sh
-      "{{ remote_init_dir }}"
-      init-nested
-      "{{ template_repo }}"
-      "{{ log_path }}"
+  script: run_env_pre_upgrade.sh "{{ remote_init_dir }}" init-nested "{{ template_repo }}" "{{ log_path }}"
   become: yes
   become_user: "{{ primary_user }}"
   tags: never
@@ -39,18 +34,9 @@
 - name: Test upgrade
   block:
   - name: Start stable env with unstable lago_host
-    script: >
-      run_env_post_upgrade.sh
-        "{{ remote_init_dir }}"
-        init-nested
-        "{{ log_path }}"
+    script: run_env_post_upgrade.sh "{{ remote_init_dir }}" init-nested "{{ log_path }}"
   - name: Create env with unstable lago
-    script: >
-      run_env.sh
-        "{{ remote_init_dir }}"
-        init-nested
-        "{{ template_repo }}"
-        "{{ log_path }}"
+    script: run_env.sh "{{ remote_init_dir }}" init-nested "{{ template_repo }}" "{{ log_path }}"
   become: yes
   become_user: "{{ primary_user }}"
   when: update_task.changed
