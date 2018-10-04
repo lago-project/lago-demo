@@ -8,7 +8,6 @@
   script: run_env_pre_upgrade.sh "{{ remote_init_dir }}" init-nested "{{ template_repo }}" "{{ log_path }}"
   become: yes
   become_user: "{{ primary_user }}"
-  tags: never
 
 - name: Upgrade lago to unstable
   block:
