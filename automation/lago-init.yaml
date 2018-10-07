@@ -1,3 +1,4 @@
+---
 common_vm_params: &common_vm_params
   memory: 2048
   service_provider: systemd
@@ -38,6 +39,17 @@ domains:
         dev: sda
         format: qcow2
       - *storage_disk
+
+  lago-vm-fc28:
+    <<: *common_vm_params
+    disks:
+      - template_name: fc28-base
+        type: template
+        name: root
+        dev: sda
+        format: qcow2
+      - *storage_disk
+
 nets:
   lago:
     type: nat

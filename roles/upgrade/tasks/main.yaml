@@ -17,7 +17,7 @@
         src: lago_unstable.repo
         dest: /etc/yum.repos.d/
         mode: 0644
-    - yum:
+    - package:
         name: "{{ item }}"
         state: latest
       with_items:

@@ -1,4 +1,2 @@
-skip_sdk_v4_verification:
-  Fedora-25
-  Fedora-26
-  Fedora-27
+---
+skip_sdk_v4_verification: "Fedora-?[0-9]*"
