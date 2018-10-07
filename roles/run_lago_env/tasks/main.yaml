@@ -5,12 +5,7 @@
     mode: 0666
 
 - name: Run Lago env
-  script: >
-    run_env.sh
-      "{{ remote_init_dir }}"
-      init-nested
-      "{{ template_repo }}"
-      "{{ log_path }}"
+  script: run_env.sh "{{ remote_init_dir }}" init-nested "{{ template_repo }}" "{{ log_path }}"
   become: yes
   become_user: "{{ item }}"
   with_items:
