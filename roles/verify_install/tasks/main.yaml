@@ -23,4 +23,4 @@
     python -c 'import ovirtsdk4;
     from ovirtsdk4 import version;
     print version.VERSION'
-  when: distro not in skip_sdk_v4_verification
+  when: distro is not match(skip_sdk_v4_verification)
