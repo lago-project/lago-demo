@@ -62,7 +62,7 @@ function exit_error() {
 }
 
 function check_virtualization() {
-  if dmesg | grep -q 'kvm: disabled by BIOS'; then
+  if dmesg | grep -qi 'kvm: disabled by BIOS'; then
       echo "Please enable virtualization in BIOS"
       exit 1
   else
