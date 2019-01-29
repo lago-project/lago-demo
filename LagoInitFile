@@ -9,7 +9,7 @@
             ],
             "disks": [
                 {
-                    "template_name": "el7-base",
+                    "template_name": "el7.6-base",
                     "type": "template",
                     "name": "root",
                     "dev": "vda",
@@ -32,7 +32,7 @@
             ],
             "disks": [
                 {
-                    "template_name": "el7-base",
+                    "template_name": "el7.6-base",
                     "type": "template",
                     "name": "root",
                     "dev": "vda",
@@ -54,7 +54,7 @@
             ],
             "disks": [
                 {
-                    "template_name": "fc23-base",
+                    "template_name": "fc29-base",
                     "type": "template",
                     "name": "root",
                     "dev": "vda",
